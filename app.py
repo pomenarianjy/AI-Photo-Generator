@@ -98,56 +98,18 @@ def run_single_style_generation(style_name, visual_instruction, image_obj):
 left_view, right_view = st.columns([3, 2], gap="large")
 
 # ==========================================
-# RIGHT VIEW: INTERACTIVE LIVE RUN PANEL
-# ==========================================
-with right_view:
-    st.subheader("⚙️ Live Transformation Control Room")
-    
-    # Let users upload directly
-    uploaded_file = st.file_uploader("📸 Step 1: Upload your own portrait image (Optional)", type=["jpg", "jpeg", "png"])
-    
-    # Check if user uploaded a file, otherwise fall back to baseline lemur
-    original_img = None
-    if uploaded_file is not None:
-        original_img = Image.open(uploaded_file)
-        st.image(original_img, width=150, caption="Uploaded Target Profile")
-    else:
-        original_img = load_local_image("baseline.jpg")
-        if original_img:
-            st.image(original_img, width=150, caption="Default Base Reference (baseline.jpg)")
-        else:
-            st.warning("⚠️ No picture uploaded and 'baseline.jpg' was not found in repo. Please upload a file to proceed.")
-
-    # User picks EXACTLY ONE style at a time
-    selected_style = st.selectbox("🎯 Step 2: Target Dimension Universe:", list(STYLE_MAP.keys()))
-    
-    st.write(f"**Current Style Configuration:**")
-    st.info(f"\"{STYLE_MAP[selected_style]}\"")
-    
-    # Single Action Trigger Button
-    if st.button(f"Transform to {selected_style} 🚀", type="primary"):
-        if not DEEPSEEK_API_KEY or not HUGGINGFACE_API_KEY:
-            st.error("🔑 API Keys Missing: Please check your secrets configurations drawer.")
-        elif original_img is None:
-            st.error("Missing Target Image: You must upload a file above before starting.")
-        else:
-            with st.spinner(f"Warping portrait into the {selected_style} matrix..."):
-                art_out, text_out = run_single_style_generation(selected_style, STYLE_MAP[selected_style], original_img)
-                
-                if art_out:
-                    st.write("---")
-                    st.success("🎉 Transformation Complete!")
-                    st.image(art_out, use_container_width=True, caption=f"Your Transformed Portrait: {selected_style}")
-                    st.markdown(f"### 📜 Multiverse Timeline Identity")
-                    st.info(text_out)
-                else:
-                    st.write("---")
-                    st.error(text_out)
-
-# ==========================================
-# LEFT VIEW: STATIC MULTIVERSE EXHIBIT GRID
+# LEFT VIEW: BASE REFERENCE & EXHIBIT GALLERY
 # ==========================================
 with left_view:
+    # Placed directly underneath the column layout declaration under main titles
+    st.subheader("📸 Original Base Portrait Reference")
+    original_img = load_local_image("baseline.jpg")
+    if original_img:
+        st.image(original_img, width=220, caption="Base Image: baseline.jpg")
+    else:
+        st.info("💡 baseline.jpg not detected in root directory. Live uploaded file will act as context.")
+
+    st.write("---")
     st.subheader("🖼️ Universe Samples Exhibit Gallery")
     st.caption("Here is what each dimension looks like using our sample models:")
     st.write("---")
@@ -168,7 +130,7 @@ with left_view:
             if sample_img:
                 st.image(sample_img, use_container_width=True)
             else:
-                st.info(f"💡 Upload '{sample_img_file}' to GitHub to view preview.")
+                st.info(f"💡 Upload '{sample_img_file}' to view sample.")
                 
         # Right Slot
         if i + 1 < len(styles_list):
@@ -181,14 +143,61 @@ with left_view:
                 if sample_img_2:
                     st.image(sample_img_2, use_container_width=True)
                 else:
-                    st.info(f"💡 Upload '{sample_img_file_2}' to GitHub to view preview.")
+                    st.info(f"💡 Upload '{sample_img_file_2}' to view sample.")
         st.write("")
+
+# ==========================================
+# RIGHT VIEW: INTERACTIVE LIVE RUN PANEL
+# ==========================================
+with right_view:
+    st.subheader("⚙️ Live Transformation Control Room")
+    
+    # Let users upload directly
+    uploaded_file = st.file_uploader("📸 Step 1: Upload your own portrait image (Optional)", type=["jpg", "jpeg", "png"])
+    
+    # Use uploaded image if available; otherwise use the loaded baseline_img
+    active_img = None
+    if uploaded_file is not None:
+        active_img = Image.open(uploaded_file)
+        st.image(active_img, width=150, caption="Uploaded Target Profile")
+    else:
+        active_img = original_img
+        if active_img:
+            st.info("Using baseline.jpg configuration as target source.")
+        else:
+            st.warning("⚠️ Ready to process: Please upload a file to customize the input target.")
+
+    # User picks EXACTLY ONE style at a time
+    selected_style = st.selectbox("🎯 Step 2: Target Dimension Universe:", list(STYLE_MAP.keys()))
+    
+    st.write(f"**Current Style Configuration:**")
+    st.info(f"\"{STYLE_MAP[selected_style]}\"")
+    
+    # Single Action Trigger Button
+    if st.button(f"Transform to {selected_style} 🚀", type="primary"):
+        if not DEEPSEEK_API_KEY or not HUGGINGFACE_API_KEY:
+            st.error("🔑 API Keys Missing: Please check your secrets configurations drawer.")
+        elif active_img is None:
+            st.error("Missing Target Image: You must upload a file or supply baseline.jpg before starting.")
+        else:
+            with st.spinner(f"Warping portrait into the {selected_style} matrix..."):
+                art_out, text_out = run_single_style_generation(selected_style, STYLE_MAP[selected_style], active_img)
+                
+                if art_out:
+                    st.write("---")
+                    st.success("🎉 Transformation Complete!")
+                    st.image(art_out, use_container_width=True, caption=f"Your Transformed Portrait: {selected_style}")
+                    st.markdown(f"### 📜 Multiverse Timeline Identity")
+                    st.info(text_out)
+                else:
+                    st.write("---")
+                    st.error(text_out)
 
 # ==========================================
 # FOOTER SIGNATURE SECTION
 # ==========================================
 st.write("---")
 st.markdown(
-    '<p style="font-family:\'Comic Sans MS\', \'Chalkboard SE\', sans-serif; color: #FF69B4; font-size: 32px; font-weight: bold; text-align: center; text-shadow: 2px 2px 4px #FFC0CB; padding: 20px 0px;">✨ Have a Great Day! 💕</p>', 
+    '<p style="font-family:\'Brush Script MT\', \'cursive\', sans-serif; color: #FF69B4; font-size: 36px; text-align: center; padding: 25px 0px; margin: 0;">Have a Great Day</p>', 
     unsafe_allow_html=True
 )
