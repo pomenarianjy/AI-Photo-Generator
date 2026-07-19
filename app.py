@@ -28,9 +28,15 @@ STYLE_MAP = {
     "James Bond": "Classic suave secret agent aesthetic, sharp tuxedo formal wear, cinematic high-contrast spy film lighting, luxurious urban backdrop",
     "Iron Man": "High-tech armored suit aesthetic, glowing blue arc reactor chest illumination, sleek metallic reflection finish, holographic interface hud elements",
     "Bat man": "Dark gritty vigilante aesthetic, cinematic moody shadow lighting, iconic cowl silhouette, gothic dark city atmosphere",
+    "Indiana Jones": "Adventurous archaeology explorer style, weathered fedora and leather jacket, cinematic golden-hour desert lighting, dusty relic-filled background",
+    "Dune": "Sci-fi epic desert aesthetic, arid planetary landscape, tactical desert gear with cooling tech, harsh sunlight and vast sand dune atmosphere",
     "One Piece": "Vibrant custom anime character design, grand line pirate emblem styling, highly detailed colored manga illustration",
     "Naruto": "Masashi Kishimoto anime layout, Hidden Leaf ninja portrait style, dynamic chakra energy aura effect, sharp manga linework",
+    "Chainsaw Man": "Dark gritty modern anime aesthetic, high-octane action style, sharp edgy character design, blood-splatter or industrial urban atmosphere",
+    "Demon Slayer": "Taisho-era dark fantasy anime style, flowing water or flame visual effects, detailed haori patterns, cinematic breath-style aura",
+    "Jujutsu Kaisen": "Modern dark fantasy anime aesthetic, cursed energy visual effects, high-contrast urban setting, sharp and stylish character line work",
     "Rurouni Kenshin": "Classic Meiji era samurai aesthetic, cross-shaped cheek scar detail, flowing crimson standard kimono robes, traditional Japanese ink wash background texture",
+    "Shaolin Soccer": "Dynamic sports-action aesthetic, high-energy martial arts motion blur, bright cinematic stadium lighting, stylized athletic gear with glowing supernatural fire effects",
     "沉香如屑 九重天帝君": "Xianxia celestial style, Immortal Samsara heavenly emperor look, pure white and silver silk robes, ethereal glowing white hair, sacred ancient palace fog backdrop",
     "蒼蘭訣 月尊": "Dark fantasy xianxia aesthetic, Love Between Fairy and Devil Moon Supreme styling, commanding dark obsidian silk robes with gold trim, dramatic blue or green primordial fire accents",
     "三生三世枕上書 東華帝君": "Eternal Love of Dream xianxia aesthetic, Donghua Dijun look, signature flowing purple royal robes, long silver hair, majestic and serene heavenly palace backdrop",
@@ -55,7 +61,6 @@ left_view, right_view = st.columns([3, 2], gap="large")
 
 with left_view:
     st.subheader("Original Base Portrait Reference")
-    # Aligned with gallery grid (2-column layout)
     col_a, col_b = st.columns(2)
     with col_a:
         original_img = load_local_image("baseline.jpg")
