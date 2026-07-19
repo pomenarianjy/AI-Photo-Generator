@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import os
 from io import BytesIO
 from PIL import Image
 from openai import OpenAI
@@ -29,20 +30,13 @@ STYLE_MAP = {
     "Harry Potter": "Hogwarts grand magic atmosphere background, wizards robes clothing styling layout, holding a magic wand"
 }
 
-# The Target Photo URL
-IMAGE_URL = "https://www.caproasia.com/wp-content/uploads/2023/06/BNP-Paribas-Appoints-Lemuel-Lee-as-Head-of-Wealth-Management-Hong-Kong.jpg"
+# Load the local baseline image from your repository folder
+def load_local_image():
+    if os.path.exists("baseline.jpg"):
+        return Image.open("baseline.jpg")
+    return None
 
-@st.cache_data(show_spinner=False)
-def load_base_image(url):
-    """Loads the original image and keeps it in cache memory."""
-    try:
-        res = requests.get(url, timeout=15)
-        return Image.open(BytesIO(res.content))
-    except Exception:
-        return None
-
-# Load the core original photo
-original_img = load_base_image(IMAGE_URL)
+original_img = load_local_image()
 
 # --- SECTION 1: THE ORIGINAL PORTRAIT ---
 st.write("---")
@@ -50,14 +44,13 @@ st.subheader("📸 The Original Baseline Portrait")
 if original_img:
     st.image(original_img, width=280, caption="Base Reference Image")
 else:
-    st.error("Could not stream the reference photo automatically. Verify internet pathways.")
+    st.error("Missing local image asset. Make sure 'baseline.jpg' is uploaded to the root directory of your GitHub repository.")
 
 # --- SECTION 2: THE 10-STYLE GENERATION SHOWCASE ---
 st.write("---")
 st.subheader("🌀 The Multiverse Gallery")
 st.info("Click the generation engine button below to initialize all 10 alternate-dimension styles side-by-side simultaneously!")
 
-# Setup generation handler function
 def run_style_generation(style_name, visual_instruction, image_obj):
     try:
         # 1. Transform Image
@@ -80,7 +73,7 @@ def run_style_generation(style_name, visual_instruction, image_obj):
 
         # 2. Build Backstory via DeepSeek
         client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com/v1")
-        story_prompt = f"Write a funny, catchy, family-safe, 3-sentence backstory introducing an anonymous new character who just landed inside the '{style_name}' universe. Do not use names."
+        story_prompt = f"Write a funny, catchy, family-safe, 3-sentence backstory introducing an anonymous new character who just landed inside the '{style_name}' universe. Do not use names or identify real people."
         
         completion = client.chat.completions.create(
             model="deepseek-chat",
@@ -100,10 +93,9 @@ if st.button("Generate All Styles Matrix 🚀", type="primary"):
     elif not original_img:
         st.error("Base image failed to stage.")
     else:
-        # Loop over all items in styles list to generate visual grid rows
         styles_list = list(STYLE_MAP.keys())
         
-        # Split items cleanly across clean structural column blocks (2 per row layout)
+        # Split items across 2 columns per row layout
         for i in range(0, len(styles_list), 2):
             col1, col2 = st.columns(2)
             
@@ -118,7 +110,7 @@ if st.button("Generate All Styles Matrix 🚀", type="primary"):
                     else:
                         st.error(text_out)
             
-            # Right Card Item (Check index bounds safety match)
+            # Right Card Item
             if i + 1 < len(styles_list):
                 with col2:
                     st.write(f"### 🪐 {styles_list[i+1]}")
