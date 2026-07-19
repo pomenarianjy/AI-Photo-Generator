@@ -16,13 +16,17 @@ st.write("Browse the multiverse styles below. Upload your photo and select a dim
 DEEPSEEK_API_KEY = st.secrets.get("DEEPSEEK_API_KEY", "")
 HUGGINGFACE_API_KEY = st.secrets.get("HUGGINGFACE_API_KEY", "")
 
-# Streamlined core map containing exactly 5 targeted styles
+# Catalog map containing your 9 targeted styles
 STYLE_MAP = {
     "Ghibli Style": "Studio Ghibli aesthetic, Hayao Miyazaki drawing style, lush background landscape illustration, anime character profile",
     "One Piece": "One Piece manga profile sketch style, Eiichiro Oda layout artwork, dynamic sea pirate backdrop, anime aesthetic",
     "Pixar Style": "Pixar 3D animation style, big expressive eyes, smooth clay lighting shader, cinematic Disney cartoon profile",
     "Anime Style": "Modern clean anime character illustration, sharp vector linework, high contrast lighting, aesthetic Japanese cell shading",
-    "Pixel Art": "Retro 16-bit pixel art portrait, classic retro video game character icon, pixelated shading texture, blocky retro color scheme"
+    "Pixel Art": "Retro 16-bit pixel art portrait, classic retro video game character icon, pixelated shading texture, blocky retro color scheme",
+    "Jurassic Park": "Prehistoric jungle wilderness theme, cinematic adventure film style, deep emerald tropical foliage background, amber lighting hue",
+    "Naruto": "Masashi Kishimoto anime layout, Hidden Leaf ninja portrait style, dynamic chakra energy aura effect, sharp manga linework",
+    "Star Wars": "Sci-fi space opera portrait, cinematic sci-fi lighting glow, glowing plasma blade illumination reflection, galaxy background",
+    "One Piece Character": "Vibrant custom anime character design, grand line pirate emblem styling, highly detailed colored manga illustration"
 }
 
 # Helper to load gallery preview images safely with case-insensitive fallback logic
@@ -104,7 +108,6 @@ with left_view:
     st.subheader("Original Base Portrait Reference")
     original_img = load_local_image("baseline.jpg")
     if original_img:
-        # Placed in a matching half-width sub-column to exactly mirror the grid items below
         img_col1, img_col2 = st.columns(2)
         with img_col1:
             st.image(original_img, use_container_width=True, caption="Base Image: baseline.jpg")
@@ -176,8 +179,6 @@ with right_view:
             st.image(active_img, width=150, caption="Uploaded Target Profile")
     else:
         active_img = original_img
-        if not active_img:
-            st.warning("Ready to process: Please upload a file to customize the input target.")
 
     selected_style = st.selectbox("Step 2: Target Dimension Universe:", list(STYLE_MAP.keys()))
     
