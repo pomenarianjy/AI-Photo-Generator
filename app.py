@@ -1,10 +1,6 @@
 import streamlit as st
-import requests
 import os
-import time
-from io import BytesIO
 from PIL import Image
-from openai import OpenAI
 
 # Page setup
 st.set_page_config(page_title="AI Universe Transformation Showcase 🌌", layout="wide")
@@ -42,25 +38,34 @@ STYLE_MAP = {
     "夜华 三生三世十里桃花": "Three Lives Three Worlds Ten Miles of Peach Blossoms aesthetic, Ye Hua character style, commanding pure black silk robes, long sleek dark hair, mystical peach blossom orchard backdrop"
 }
 
+# Super-Failsafe Image Loader (Finds .jpg, .png, .jpeg regardless of name case)
 def load_local_image(filename):
-    if os.path.exists(filename):
-        return Image.open(filename)
+    name_no_ext = os.path.splitext(filename)[0].lower()
+    base_dir = "."
+    if os.path.exists(base_dir):
+        for f in os.listdir(base_dir):
+            f_name, f_ext = os.path.splitext(f)
+            if f_name.lower() == name_no_ext and f_ext.lower() in ['.jpg', '.jpeg', '.png']:
+                try: return Image.open(os.path.join(base_dir, f))
+                except: continue
     return None
 
 # --- MAIN LAYOUT ---
 left_view, right_view = st.columns([3, 2], gap="large")
 
 with left_view:
-    # RE-SIZED BASELINE: Matched to the grid width
     st.subheader("Original Base Portrait Reference")
+    # Aligned with gallery grid (2-column layout)
     col_a, col_b = st.columns(2)
     with col_a:
         original_img = load_local_image("baseline.jpg")
         if original_img:
-            st.image(original_img, use_container_width=True, caption="Baseline")
+            st.image(original_img, use_container_width=True, caption="Baseline Portrait")
+        else:
+            st.info("baseline.jpg missing")
     
     st.write("---")
-    st.subheader("Universe Samples Exhibit Gallery")
+    st.subheader("🪐 Universe Samples Exhibit Gallery")
     
     styles_list = list(STYLE_MAP.keys())
     for i in range(0, len(styles_list), 2):
@@ -74,10 +79,10 @@ with left_view:
                     fname = f"{s.lower().replace(' ', '_')}.jpg"
                     img = load_local_image(fname)
                     if img: st.image(img, use_container_width=True)
-                    else: st.info(f"Upload '{fname}'")
+                    else: st.warning(f"Missing image for: {s}")
 
 with right_view:
-    st.subheader("Live Transformation Control Room")
+    st.subheader("⚙️ Live Transformation Control Room")
     uploaded_file = st.file_uploader("Upload portrait (4MB limit)", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         st.image(uploaded_file, width=150)
@@ -85,9 +90,10 @@ with right_view:
     selected_style = st.selectbox("Target Dimension:", list(STYLE_MAP.keys()))
     st.info(f"Configuration: {STYLE_MAP[selected_style]}")
     
-    if st.button("Transform"):
+    if st.button("🚀 Warp Now!", type="primary"):
         st.write("Transformation engine triggered...")
 
+# Footer Logo
 st.write("---")
 logo = load_local_image("logo.jpg")
 if logo:
