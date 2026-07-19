@@ -101,11 +101,9 @@ left_view, right_view = st.columns([3, 2], gap="large")
 # LEFT VIEW: BASE REFERENCE & EXHIBIT GALLERY
 # ==========================================
 with left_view:
-    # Placed directly underneath the column layout declaration under main titles
     st.subheader("📸 Original Base Portrait Reference")
     original_img = load_local_image("baseline.jpg")
     if original_img:
-        # Fixed: Changed from width=220 to use full container width to match the grid below perfectly
         st.image(original_img, use_container_width=True, caption="Base Image: baseline.jpg")
     else:
         st.info("💡 baseline.jpg not detected in root directory. Live uploaded file will act as context.")
@@ -117,11 +115,9 @@ with left_view:
     
     styles_list = list(STYLE_MAP.keys())
     
-    # Render styles sequentially to balance columns neatly
     for i in range(0, len(styles_list), 2):
         row_col1, row_col2 = st.columns(2)
         
-        # Left Slot
         with row_col1:
             s1 = styles_list[i]
             st.markdown(f"**🪐 {s1}**")
@@ -133,7 +129,6 @@ with left_view:
             else:
                 st.info(f"💡 Upload '{sample_img_file}' to view sample.")
                 
-        # Right Slot
         if i + 1 < len(styles_list):
             with row_col2:
                 s2 = styles_list[i+1]
@@ -153,14 +148,33 @@ with left_view:
 with right_view:
     st.subheader("⚙️ Live Transformation Control Room")
     
-    # Let users upload directly
+    # Inline clean grey label context next to title area
+    st.markdown("<span style='color: #888888; font-size: 13px; display: block; margin-bottom: -10px;'>Limits: Maximum 4MB size per image • Standard JPEG/PNG format preferred</span>", unsafe_allow_html=True)
     uploaded_file = st.file_uploader("📸 Step 1: Upload your own portrait image (Optional)", type=["jpg", "jpeg", "png"])
     
-    # Use uploaded image if available; otherwise use the loaded baseline_img
+    # Validation Compliance Check Pipeline
     active_img = None
+    is_file_compliant = True
+    
     if uploaded_file is not None:
-        active_img = Image.open(uploaded_file)
-        st.image(active_img, width=150, caption="Uploaded Target Profile")
+        # Check 1: File size ceiling check (4MB = 4 * 1024 * 1024 bytes)
+        max_bytes = 4 * 1024 * 1024
+        if uploaded_file.size > max_bytes:
+            st.error(f"❌ File too large: Your file is {uploaded_file.size / (1024*1024):.2f}MB. Please compress the file below 4MB to prevent engine upload drops.")
+            is_file_compliant = False
+        else:
+            # Check 2: Structural health parse check
+            try:
+                active_img = Image.open(uploaded_file)
+                active_img.verify()  # Verifies image integrity without loading full pixel payload
+                active_img = Image.open(uploaded_file)  # Re-open because verify() closes the file descriptor stream
+            except Exception:
+                st.error("❌ Invalid File Structure: The uploaded file appears corrupted or uses an unsupported compression matrix.")
+                is_file_compliant = False
+
+        if is_file_compliant and active_img:
+            st.success("✅ File verified: Structure and payload size match compliance standards.")
+            st.image(active_img, width=150, caption="Uploaded Target Profile")
     else:
         active_img = original_img
         if active_img:
@@ -168,18 +182,17 @@ with right_view:
         else:
             st.warning("⚠️ Ready to process: Please upload a file to customize the input target.")
 
-    # User picks EXACTLY ONE style at a time
     selected_style = st.selectbox("🎯 Step 2: Target Dimension Universe:", list(STYLE_MAP.keys()))
     
     st.write(f"**Current Style Configuration:**")
     st.info(f"\"{STYLE_MAP[selected_style]}\"")
     
-    # Single Action Trigger Button
-    if st.button(f"Transform to {selected_style} 🚀", type="primary"):
+    # Block target processing completely if the uploaded file failed the verification pass
+    if st.button(f"Transform to {selected_style} 🚀", type="primary", disabled=not is_file_compliant):
         if not DEEPSEEK_API_KEY or not HUGGINGFACE_API_KEY:
             st.error("🔑 API Keys Missing: Please check your secrets configurations drawer.")
         elif active_img is None:
-            st.error("Missing Target Image: You must upload a file or supply baseline.jpg before starting.")
+            st.error("Missing Target Image: You must upload a clean file or supply baseline.jpg before starting.")
         else:
             with st.spinner(f"Warping portrait into the {selected_style} matrix..."):
                 art_out, text_out = run_single_style_generation(selected_style, STYLE_MAP[selected_style], active_img)
