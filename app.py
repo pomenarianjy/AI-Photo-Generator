@@ -16,17 +16,22 @@ st.write("Browse the multiverse styles below. Upload your photo and select a dim
 DEEPSEEK_API_KEY = st.secrets.get("DEEPSEEK_API_KEY", "")
 HUGGINGFACE_API_KEY = st.secrets.get("HUGGINGFACE_API_KEY", "")
 
-# Catalog map containing your 9 targeted styles
+# Catalog map containing your 14 targeted styles
 STYLE_MAP = {
     "Ghibli Style": "Studio Ghibli aesthetic, Hayao Miyazaki drawing style, lush background landscape illustration, anime character profile",
-    "One Piece": "One Piece manga profile sketch style, Eiichiro Oda layout artwork, dynamic sea pirate backdrop, anime aesthetic",
     "Pixar Style": "Pixar 3D animation style, big expressive eyes, smooth clay lighting shader, cinematic Disney cartoon profile",
     "Anime Style": "Modern clean anime character illustration, sharp vector linework, high contrast lighting, aesthetic Japanese cell shading",
     "Pixel Art": "Retro 16-bit pixel art portrait, classic retro video game character icon, pixelated shading texture, blocky retro color scheme",
     "Jurassic Park": "Prehistoric jungle wilderness theme, cinematic adventure film style, deep emerald tropical foliage background, amber lighting hue",
     "Naruto": "Masashi Kishimoto anime layout, Hidden Leaf ninja portrait style, dynamic chakra energy aura effect, sharp manga linework",
     "Star Wars": "Sci-fi space opera portrait, cinematic sci-fi lighting glow, glowing plasma blade illumination reflection, galaxy background",
-    "One Piece Character": "Vibrant custom anime character design, grand line pirate emblem styling, highly detailed colored manga illustration"
+    "One Piece Character": "Vibrant custom anime character design, grand line pirate emblem styling, highly detailed colored manga illustration",
+    "Lord of the Rings": "High fantasy epic aesthetic, cinematic middle-earth background, ambient glowing ethereal light, detailed elven or heroic armor portrait",
+    "Pirates of the Caribbean": "Swashbuckling high-seas adventure theme, weathered cinematic pirate look, dark ocean fog backdrop, dramatic coastal torchlight",
+    "Iron Man": "High-tech armored suit aesthetic, glowing blue arc reactor chest illumination, sleek metallic reflection finish, holographic interface hud elements",
+    "Rurouni Kenshin": "Classic Meiji era samurai aesthetic, cross-shaped cheek scar detail, flowing crimson standard kimono robes, traditional Japanese ink wash background texture",
+    "沉香如屑 九重天帝君": "Xianxia celestial style, Immortal Samsara heavenly emperor look, pure white and silver silk robes, ethereal glowing white hair, sacred ancient palace fog backdrop",
+    "蒼蘭訣 月尊": "Dark fantasy xianxia aesthetic, Love Between Fairy and Devil Moon Supreme styling, commanding dark obsidian silk robes with gold trim, dramatic blue or green primordial fire accents"
 }
 
 # Helper to load gallery preview images safely with case-insensitive fallback logic
