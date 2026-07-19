@@ -24,10 +24,22 @@ STYLE_MAP = {
     "Pixel Art": "Retro 16-bit pixel art portrait, classic retro video game character icon, pixelated shading texture, blocky retro color scheme"
 }
 
-# Helper to load images safely
+# Helper to load images safely with case-insensitive fallback logic
 def load_local_image(filename):
+    # Try exact match first (case-sensitive lookups work on local Windows/Mac dev environments)
     if os.path.exists(filename):
         return Image.open(filename)
+    
+    # Robust fallback for Linux servers (like Streamlit Cloud) where casing must match exactly
+    base_dir = "."
+    try:
+        files = os.listdir(base_dir)
+        for f in files:
+            if f.lower() == filename.lower():
+                return Image.open(os.path.join(base_dir, f))
+    except Exception:
+        pass
+        
     return None
 
 original_img = load_local_image("baseline.jpg")
