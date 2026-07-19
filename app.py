@@ -9,7 +9,7 @@ from openai import OpenAI
 st.set_page_config(page_title="AI Universe Transformation Showcase 🌌", layout="wide")
 
 st.title("AI Universe Style Transformation Showcase 🌌")
-st.write("Browse the multiverse styles below. Select a single dimension in the control panel to run the transformation engine!")
+st.write("Browse the multiverse styles below. Upload your photo and select a dimension to run the transformation engine!")
 
 # Securely pull API keys from Streamlit secrets manager
 DEEPSEEK_API_KEY = st.secrets.get("DEEPSEEK_API_KEY", "")
@@ -24,13 +24,11 @@ STYLE_MAP = {
     "Pixel Art": "Retro 16-bit pixel art portrait, classic retro video game character icon, pixelated shading texture, blocky retro color scheme"
 }
 
-# Helper to load images safely with case-insensitive fallback logic
+# Helper to load gallery preview images safely with case-insensitive fallback logic
 def load_local_image(filename):
-    # Try exact match first (case-sensitive lookups work on local Windows/Mac dev environments)
     if os.path.exists(filename):
         return Image.open(filename)
     
-    # Robust fallback for Linux servers (like Streamlit Cloud) where casing must match exactly
     base_dir = "."
     try:
         files = os.listdir(base_dir)
@@ -39,10 +37,7 @@ def load_local_image(filename):
                 return Image.open(os.path.join(base_dir, f))
     except Exception:
         pass
-        
     return None
-
-original_img = load_local_image("baseline.jpg")
 
 # Live Transformation Engine (Runs only ONE style request at a time)
 def run_single_style_generation(style_name, visual_instruction, image_obj):
@@ -57,11 +52,11 @@ def run_single_style_generation(style_name, visual_instruction, image_obj):
             "Content-Type": "application/octet-stream"
         }
         
-        # Extended timeout for stability during single requests
-        hf_res = requests.post(url, headers=hf_headers, data=img_bytes, params={"prompt": visual_instruction}, timeout=30)
+        # Post request with direct timeout boundaries
+        hf_res = requests.post(url, headers=hf_headers, data=img_bytes, params={"prompt": visual_instruction}, timeout=25)
 
         if hf_res.status_code != 200:
-            return None, f"Visual engine busy (Status {hf_res.status_code}). Hugging Face is processing other global queues. Please try again in a few seconds."
+            return None, f"Visual engine busy (Status {hf_res.status_code}). Hugging Face is processing other global queues. Please try again shortly."
         
         transformed_art = Image.open(BytesIO(hf_res.content))
 
@@ -77,6 +72,8 @@ def run_single_style_generation(style_name, visual_instruction, image_obj):
         story_text = completion.choices[0].message.content
         return transformed_art, story_text
 
+    except requests.exceptions.ConnectionError:
+        return None, "Network link interrupted. The application server lost connection to Hugging Face. Please try rebooting the Streamlit dashboard app console."
     except Exception as e:
         return None, f"Portal error: {str(e)}"
 
@@ -84,20 +81,54 @@ def run_single_style_generation(style_name, visual_instruction, image_obj):
 left_view, right_view = st.columns([3, 2], gap="large")
 
 # ==========================================
+# RIGHT VIEW: INTERACTIVE LIVE RUN PANEL (Moved calculation logic upper priority)
+# ==========================================
+with right_view:
+    st.subheader("⚙️ Live Transformation Control Room")
+    
+    # NEW UPLOADER: Let users upload directly instead of reading baseline.jpg
+    uploaded_file = st.file_uploader("📸 Step 1: Upload a portrait image (JPG/PNG)", type=["jpg", "jpeg", "png"])
+    
+    original_img = None
+    if uploaded_file is not None:
+        original_img = Image.open(uploaded_file)
+        st.image(original_img, width=150, caption="Uploaded Target Profile")
+    else:
+        st.warning("⚠️ Please upload a picture here to run transformations.")
+
+    # User picks EXACTLY ONE style at a time
+    selected_style = st.selectbox("🎯 Step 2: Target Dimension Universe:", list(STYLE_MAP.keys()))
+    
+    st.write(f"**Current Style Configuration:**")
+    st.info(f"\"{STYLE_MAP[selected_style]}\"")
+    
+    # Single Action Trigger Button
+    if st.button(f"Transform to {selected_style} 🚀", type="primary"):
+        if not DEEPSEEK_API_KEY or not HUGGINGFACE_API_KEY:
+            st.error("🔑 API Keys Missing: Please check your secrets configurations drawer.")
+        elif original_img is None:
+            st.error("Missing Target Image: You must upload a file above before starting.")
+        else:
+            with st.spinner(f"Initializing connection... warping portrait into {selected_style}..."):
+                art_out, text_out = run_single_style_generation(selected_style, STYLE_MAP[selected_style], original_img)
+                
+                if art_out:
+                    st.write("---")
+                    st.success("🎉 Transformation Complete!")
+                    st.image(art_out, use_container_width=True, caption=f"Your Transformed Portrait: {selected_style}")
+                    st.markdown(f"### 📜 Multiverse Timeline Identity")
+                    st.success(text_out)
+                else:
+                    st.write("---")
+                    st.error(text_out)
+
+# ==========================================
 # LEFT VIEW: STATIC MULTIVERSE EXHIBIT GRID
 # ==========================================
 with left_view:
-    st.subheader("📸 The Reference & Multiverse Preview Gallery")
-    
-    # Showcase base portrait at the top
-    if original_img:
-        st.image(original_img, width=200, caption="Your Base Reference Image")
-    else:
-        st.error("Missing local 'baseline.jpg' file.")
-        
-    st.write("---")
-    st.markdown("### 🖼️ Universe Samples Exhibit")
+    st.subheader("🖼️ Universe Samples Exhibit Gallery")
     st.caption("Here is what each dimension looks like using our sample models:")
+    st.write("---")
     
     styles_list = list(STYLE_MAP.keys())
     
@@ -115,7 +146,7 @@ with left_view:
             if sample_img:
                 st.image(sample_img, use_container_width=True)
             else:
-                st.info(f"💡 Upload '{sample_img_file}' to view sample.")
+                st.info(f"💡 Upload '{sample_img_file}' to GitHub to view preview.")
                 
         # Right Slot
         if i + 1 < len(styles_list):
@@ -128,38 +159,5 @@ with left_view:
                 if sample_img_2:
                     st.image(sample_img_2, use_container_width=True)
                 else:
-                    st.info(f"💡 Upload '{sample_img_file_2}' to view sample.")
+                    st.info(f"💡 Upload '{sample_img_file_2}' to GitHub to view preview.")
         st.write("")
-
-# ==========================================
-# RIGHT VIEW: INTERACTIVE LIVE RUN PANEL
-# ==========================================
-with right_view:
-    st.subheader("⚙️ Live Transformation Control Room")
-    st.write("Select a single style dimensions target parameter below to execute your live conversion via the neural engine link.")
-    
-    # User picks EXACTLY ONE style at a time
-    selected_style = st.selectbox("🎯 Target Dimension Universe:", list(STYLE_MAP.keys()))
-    
-    st.write(f"**Current Style Configuration:**")
-    st.info(f"\"{STYLE_MAP[selected_style]}\"")
-    
-    # Single Action Trigger Button
-    if st.button(f"Transform to {selected_style} 🚀", type="primary"):
-        if not DEEPSEEK_API_KEY or not HUGGINGFACE_API_KEY:
-            st.error("🔑 API Keys Missing: Please check your secrets configurations drawer.")
-        elif not original_img:
-            st.error("Base portrait missing.")
-        else:
-            with st.spinner(f"Initializing connection... warping baseline portrait into {selected_style}..."):
-                art_out, text_out = run_single_style_generation(selected_style, STYLE_MAP[selected_style], original_img)
-                
-                if art_out:
-                    st.write("---")
-                    st.success("🎉 Transformation Complete!")
-                    st.image(art_out, use_container_width=True, caption=f"Your Transformed Portrait: {selected_style}")
-                    st.markdown(f"### 📜 Multiverse Timeline Identity")
-                    st.success(text_out)
-                else:
-                    st.write("---")
-                    st.error(text_out)
