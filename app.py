@@ -9,14 +9,15 @@ from openai import OpenAI
 # Page setup
 st.set_page_config(page_title="AI Universe Transformation Showcase 🌌", layout="wide")
 
-st.title("AI Universe Style Transformation Showcase 🌌")
-st.write("Browse the multiverse styles below. Upload your photo and select a dimension to run the transformation engine!")
+# Lively Intro
+st.markdown("""
+# 🌌 Welcome to the Multiverse Portal
+**Ready to jump through time and space?** 🚀  
+Select your dream destination, upload your portrait, and watch as our AI engine warps you into the hero, legend, or traveler you were meant to be. From epic galaxy battles to mystical xianxia realms, your transformation awaits—**where will your journey take you today?**
+""")
+st.write("---")
 
-# Securely pull API keys from Streamlit secrets manager
-DEEPSEEK_API_KEY = st.secrets.get("DEEPSEEK_API_KEY", "")
-HUGGINGFACE_API_KEY = st.secrets.get("HUGGINGFACE_API_KEY", "")
-
-# Catalog map containing your 22 targeted styles in specific order
+# Catalog map
 STYLE_MAP = {
     "Ghibli Style": "Studio Ghibli aesthetic, Hayao Miyazaki drawing style, lush background landscape illustration, anime character profile",
     "Pixar Style": "Pixar 3D animation style, big expressive eyes, smooth clay lighting shader, cinematic Disney cartoon profile",
@@ -41,37 +42,27 @@ STYLE_MAP = {
     "夜华 三生三世十里桃花": "Three Lives Three Worlds Ten Miles of Peach Blossoms aesthetic, Ye Hua character style, commanding pure black silk robes, long sleek dark hair, mystical peach blossom orchard backdrop"
 }
 
-# Helper to load gallery preview images safely
 def load_local_image(filename):
     if os.path.exists(filename):
         return Image.open(filename)
-    base_dir = "."
-    try:
-        files = os.listdir(base_dir)
-        for f in files:
-            if f.lower() == filename.lower():
-                return Image.open(os.path.join(base_dir, f))
-    except Exception:
-        pass
     return None
 
 # --- MAIN LAYOUT ---
 left_view, right_view = st.columns([3, 2], gap="large")
 
 with left_view:
+    # RE-SIZED BASELINE: Matched to the grid width
     st.subheader("Original Base Portrait Reference")
-    original_img = load_local_image("baseline.jpg")
-    if original_img:
-        img_col1, _ = st.columns([1, 2])
-        with img_col1:
-            st.image(original_img, use_container_width=True, caption="Base Image: baseline.jpg")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        original_img = load_local_image("baseline.jpg")
+        if original_img:
+            st.image(original_img, use_container_width=True, caption="Baseline")
     
     st.write("---")
     st.subheader("Universe Samples Exhibit Gallery")
-    st.caption("Here is what each dimension looks like using our sample models:")
     
     styles_list = list(STYLE_MAP.keys())
-    
     for i in range(0, len(styles_list), 2):
         row_col1, row_col2 = st.columns(2)
         for col, idx in [(row_col1, i), (row_col2, i+1)]:
@@ -79,7 +70,7 @@ with left_view:
                 s = styles_list[idx]
                 with col:
                     st.markdown(f"**🪐 {s}**")
-                    st.caption(STYLE_MAP[s]) # Restored style description
+                    st.caption(STYLE_MAP[s])
                     fname = f"{s.lower().replace(' ', '_')}.jpg"
                     img = load_local_image(fname)
                     if img: st.image(img, use_container_width=True)
@@ -88,7 +79,6 @@ with left_view:
 with right_view:
     st.subheader("Live Transformation Control Room")
     uploaded_file = st.file_uploader("Upload portrait (4MB limit)", type=["jpg", "jpeg", "png"])
-    
     if uploaded_file:
         st.image(uploaded_file, width=150)
 
