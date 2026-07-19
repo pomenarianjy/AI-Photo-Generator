@@ -16,7 +16,7 @@ st.write("Browse the multiverse styles below. Upload your photo and select a dim
 DEEPSEEK_API_KEY = st.secrets.get("DEEPSEEK_API_KEY", "")
 HUGGINGFACE_API_KEY = st.secrets.get("HUGGINGFACE_API_KEY", "")
 
-# Catalog map containing your 14 targeted styles
+# Catalog map containing your 18 targeted styles
 STYLE_MAP = {
     "Ghibli Style": "Studio Ghibli aesthetic, Hayao Miyazaki drawing style, lush background landscape illustration, anime character profile",
     "Pixar Style": "Pixar 3D animation style, big expressive eyes, smooth clay lighting shader, cinematic Disney cartoon profile",
@@ -31,7 +31,11 @@ STYLE_MAP = {
     "Iron Man": "High-tech armored suit aesthetic, glowing blue arc reactor chest illumination, sleek metallic reflection finish, holographic interface hud elements",
     "Rurouni Kenshin": "Classic Meiji era samurai aesthetic, cross-shaped cheek scar detail, flowing crimson standard kimono robes, traditional Japanese ink wash background texture",
     "沉香如屑 九重天帝君": "Xianxia celestial style, Immortal Samsara heavenly emperor look, pure white and silver silk robes, ethereal glowing white hair, sacred ancient palace fog backdrop",
-    "蒼蘭訣 月尊": "Dark fantasy xianxia aesthetic, Love Between Fairy and Devil Moon Supreme styling, commanding dark obsidian silk robes with gold trim, dramatic blue or green primordial fire accents"
+    "蒼蘭訣 月尊": "Dark fantasy xianxia aesthetic, Love Between Fairy and Devil Moon Supreme styling, commanding dark obsidian silk robes with gold trim, dramatic blue or green primordial fire accents",
+    "Harry Potter": "Hogwarts wizarding world aesthetic, textured school house robes, cinematic magical candlelight ambiance, mysterious stone castle corridor backdrop",
+    "三生三世枕上書 東華帝君": "Eternal Love of Dream xianxia aesthetic, Donghua Dijun look, signature flowing purple royal robes, long silver hair, majestic and serene heavenly palace backdrop",
+    "香蜜沉沉燼如霜 潤玉": "Ashes of Love xianxia style, Runyu Night Immortal portrait, elegant pristine white and light blue silk robes, gentle ethereal aura, starry night sky backdrop",
+    "夜华 三生三世十里桃花": "Three Lives Three Worlds Ten Miles of Peach Blossoms aesthetic, Ye Hua character style, commanding pure black silk robes, long sleek dark hair, mystical peach blossom orchard backdrop"
 }
 
 # Helper to load gallery preview images safely with case-insensitive fallback logic
@@ -210,10 +214,11 @@ with right_view:
                     st.error(text_out)
 
 # ==========================================
-# FOOTER SIGNATURE SECTION
+# FOOTER LOGO SECTION
 # ==========================================
 st.write("---")
-st.markdown(
-    '<p style="font-family:\'Brush Script MT\', \'cursive\', sans-serif; color: #FF69B4; font-size: 36px; text-align: center; padding: 25px 0px; margin: 0;">Have a Great Day</p>', 
-    unsafe_allow_html=True
-)
+logo_img = load_local_image("logo.jpg")
+if logo_img:
+    footer_col1, footer_col2, footer_col3 = st.columns([2, 1, 2])
+    with footer_col2:
+        st.image(logo_img, use_container_width=True)
