@@ -105,7 +105,8 @@ with left_view:
     st.subheader("📸 Original Base Portrait Reference")
     original_img = load_local_image("baseline.jpg")
     if original_img:
-        st.image(original_img, width=220, caption="Base Image: baseline.jpg")
+        # Fixed: Changed from width=220 to use full container width to match the grid below perfectly
+        st.image(original_img, use_container_width=True, caption="Base Image: baseline.jpg")
     else:
         st.info("💡 baseline.jpg not detected in root directory. Live uploaded file will act as context.")
 
