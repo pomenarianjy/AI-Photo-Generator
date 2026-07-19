@@ -101,15 +101,18 @@ left_view, right_view = st.columns([3, 2], gap="large")
 # LEFT VIEW: BASE REFERENCE & EXHIBIT GALLERY
 # ==========================================
 with left_view:
-    st.subheader("📸 Original Base Portrait Reference")
+    st.subheader("Original Base Portrait Reference")
     original_img = load_local_image("baseline.jpg")
     if original_img:
-        st.image(original_img, use_container_width=True, caption="Base Image: baseline.jpg")
+        # Placed in a matching half-width sub-column to exactly mirror the grid items below
+        img_col1, img_col2 = st.columns(2)
+        with img_col1:
+            st.image(original_img, use_container_width=True, caption="Base Image: baseline.jpg")
     else:
-        st.info("💡 baseline.jpg not detected in root directory. Live uploaded file will act as context.")
+        st.info("baseline.jpg not detected in root directory. Live uploaded file will act as context.")
 
     st.write("---")
-    st.subheader("🖼️ Universe Samples Exhibit Gallery")
+    st.subheader("Universe Samples Exhibit Gallery")
     st.caption("Here is what each dimension looks like using our sample models:")
     st.write("---")
     
@@ -127,7 +130,7 @@ with left_view:
             if sample_img:
                 st.image(sample_img, use_container_width=True)
             else:
-                st.info(f"💡 Upload '{sample_img_file}' to view sample.")
+                st.info(f"Upload '{sample_img_file}' to view sample.")
                 
         if i + 1 < len(styles_list):
             with row_col2:
@@ -139,58 +142,51 @@ with left_view:
                 if sample_img_2:
                     st.image(sample_img_2, use_container_width=True)
                 else:
-                    st.info(f"💡 Upload '{sample_img_file_2}' to view sample.")
+                    st.info(f"Upload '{sample_img_file_2}' to view sample.")
         st.write("")
 
 # ==========================================
 # RIGHT VIEW: INTERACTIVE LIVE RUN PANEL
 # ==========================================
 with right_view:
-    st.subheader("⚙️ Live Transformation Control Room")
+    st.subheader("Live Transformation Control Room")
     
-    # Inline clean grey label context next to title area
     st.markdown("<span style='color: #888888; font-size: 13px; display: block; margin-bottom: -10px;'>Limits: Maximum 4MB size per image • Standard JPEG/PNG format preferred</span>", unsafe_allow_html=True)
-    uploaded_file = st.file_uploader("📸 Step 1: Upload your own portrait image (Optional)", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Step 1: Upload your own portrait image (Optional)", type=["jpg", "jpeg", "png"])
     
-    # Validation Compliance Check Pipeline
     active_img = None
     is_file_compliant = True
     
     if uploaded_file is not None:
-        # Check 1: File size ceiling check (4MB = 4 * 1024 * 1024 bytes)
         max_bytes = 4 * 1024 * 1024
         if uploaded_file.size > max_bytes:
-            st.error(f"❌ File too large: Your file is {uploaded_file.size / (1024*1024):.2f}MB. Please compress the file below 4MB to prevent engine upload drops.")
+            st.error(f"File too large: Your file is {uploaded_file.size / (1024*1024):.2f}MB. Please compress the file below 4MB to prevent engine upload drops.")
             is_file_compliant = False
         else:
-            # Check 2: Structural health parse check
             try:
                 active_img = Image.open(uploaded_file)
-                active_img.verify()  # Verifies image integrity without loading full pixel payload
-                active_img = Image.open(uploaded_file)  # Re-open because verify() closes the file descriptor stream
+                active_img.verify()
+                active_img = Image.open(uploaded_file)
             except Exception:
-                st.error("❌ Invalid File Structure: The uploaded file appears corrupted or uses an unsupported compression matrix.")
+                st.error("Invalid File Structure: The uploaded file appears corrupted or uses an unsupported compression matrix.")
                 is_file_compliant = False
 
         if is_file_compliant and active_img:
-            st.success("✅ File verified: Structure and payload size match compliance standards.")
+            st.success("File verified: Structure and payload size match compliance standards.")
             st.image(active_img, width=150, caption="Uploaded Target Profile")
     else:
         active_img = original_img
-        if active_img:
-            st.info("Using baseline.jpg configuration as target source.")
-        else:
-            st.warning("⚠️ Ready to process: Please upload a file to customize the input target.")
+        if not active_img:
+            st.warning("Ready to process: Please upload a file to customize the input target.")
 
-    selected_style = st.selectbox("🎯 Step 2: Target Dimension Universe:", list(STYLE_MAP.keys()))
+    selected_style = st.selectbox("Step 2: Target Dimension Universe:", list(STYLE_MAP.keys()))
     
     st.write(f"**Current Style Configuration:**")
     st.info(f"\"{STYLE_MAP[selected_style]}\"")
     
-    # Block target processing completely if the uploaded file failed the verification pass
-    if st.button(f"Transform to {selected_style} 🚀", type="primary", disabled=not is_file_compliant):
+    if st.button(f"Transform to {selected_style}", type="primary", disabled=not is_file_compliant):
         if not DEEPSEEK_API_KEY or not HUGGINGFACE_API_KEY:
-            st.error("🔑 API Keys Missing: Please check your secrets configurations drawer.")
+            st.error("API Keys Missing: Please check your secrets configurations drawer.")
         elif active_img is None:
             st.error("Missing Target Image: You must upload a clean file or supply baseline.jpg before starting.")
         else:
@@ -199,9 +195,9 @@ with right_view:
                 
                 if art_out:
                     st.write("---")
-                    st.success("🎉 Transformation Complete!")
+                    st.success("Transformation Complete!")
                     st.image(art_out, use_container_width=True, caption=f"Your Transformed Portrait: {selected_style}")
-                    st.markdown(f"### 📜 Multiverse Timeline Identity")
+                    st.markdown(f"### Multiverse Timeline Identity")
                     st.info(text_out)
                 else:
                     st.write("---")
