@@ -20,19 +20,23 @@ STYLE_MAP = {
     "Anime Style": "Modern clean anime character illustration, sharp vector linework, high contrast lighting, aesthetic Japanese cell shading",
     "Pixel Art": "Retro 16-bit pixel art portrait, classic retro video game character icon, pixelated shading texture, blocky retro color scheme",
     "Jurassic Park": "Prehistoric jungle wilderness theme, cinematic adventure film style, deep emerald tropical foliage background, amber lighting hue",
+    "James Bond": "Classic suave secret agent aesthetic, sharp tuxedo formal wear, cinematic high-contrast spy film lighting, luxurious urban backdrop",
+    "Indiana Jones": "Adventurous archaeology explorer style, weathered fedora and leather jacket, cinematic golden-hour desert lighting, dusty relic-filled background",
     "Star Wars Engineer": "Sci-fi space opera portrait, cinematic sci-fi lighting glow, detailed technical gear and mechanical uniform, galaxy background",
     "Star Wars Jedi": "Jedi Knight cinematic portrait, flowing robes, glowing plasma lightsaber illumination, mystical force aura, ancient temple backdrop",
     "Lord of the Rings": "High fantasy epic aesthetic, cinematic middle-earth background, ambient glowing ethereal light, detailed elven or heroic armor portrait",
     "Harry Potter": "Hogwarts wizarding world aesthetic, textured school house robes, cinematic magical candlelight ambiance, mysterious stone castle corridor backdrop",
     "Pirates of the Caribbean": "Swashbuckling high-seas adventure theme, weathered cinematic pirate look, dark ocean fog backdrop, dramatic coastal torchlight",
-    "James Bond": "Classic suave secret agent aesthetic, sharp tuxedo formal wear, cinematic high-contrast spy film lighting, luxurious urban backdrop",
+    "Dune": "Sci-fi epic desert aesthetic, arid planetary landscape, tactical desert gear with cooling tech, harsh sunlight and vast sand dune atmosphere",
+    "Mission Impossible": "High-octane spy action aesthetic, cinematic urban espionage setting, tactical black gear, dramatic lighting, intense atmosphere",
+    "Game of Thrones": "Epic medieval fantasy aesthetic, cinematic bleak and gritty atmosphere, high-detail noble house armor, wintry landscape backdrop",
     "Iron Man": "High-tech armored suit aesthetic, glowing blue arc reactor chest illumination, sleek metallic reflection finish, holographic interface hud elements",
     "Bat man": "Dark gritty vigilante aesthetic, cinematic moody shadow lighting, iconic cowl silhouette, gothic dark city atmosphere",
-    "Indiana Jones": "Adventurous archaeology explorer style, weathered fedora and leather jacket, cinematic golden-hour desert lighting, dusty relic-filled background",
-    "Dune": "Sci-fi epic desert aesthetic, arid planetary landscape, tactical desert gear with cooling tech, harsh sunlight and vast sand dune atmosphere",
     "One Piece": "Vibrant custom anime character design, grand line pirate emblem styling, highly detailed colored manga illustration",
     "Naruto": "Masashi Kishimoto anime layout, Hidden Leaf ninja portrait style, dynamic chakra energy aura effect, sharp manga linework",
     "Chainsaw Man": "Dark gritty modern anime aesthetic, high-octane action style, sharp edgy character design, blood-splatter or industrial urban atmosphere",
+    "Hunter x Hunter": "Dynamic shonen adventure style, high-energy action poses, vibrant character design, stylized nen energy aura effects",
+    "Detective Conan": "Classic mystery anime aesthetic, sharp investigative character design, iconic detective attire, subtle urban suspense atmosphere",
     "Demon Slayer": "Taisho-era dark fantasy anime style, flowing water or flame visual effects, detailed haori patterns, cinematic breath-style aura",
     "Jujutsu Kaisen": "Modern dark fantasy anime aesthetic, cursed energy visual effects, high-contrast urban setting, sharp and stylish character line work",
     "Rurouni Kenshin": "Classic Meiji era samurai aesthetic, cross-shaped cheek scar detail, flowing crimson standard kimono robes, traditional Japanese ink wash background texture",
@@ -41,10 +45,11 @@ STYLE_MAP = {
     "蒼蘭訣 月尊": "Dark fantasy xianxia aesthetic, Love Between Fairy and Devil Moon Supreme styling, commanding dark obsidian silk robes with gold trim, dramatic blue or green primordial fire accents",
     "三生三世枕上書 東華帝君": "Eternal Love of Dream xianxia aesthetic, Donghua Dijun look, signature flowing purple royal robes, long silver hair, majestic and serene heavenly palace backdrop",
     "香蜜沉沉燼如霜 潤玉": "Ashes of Love xianxia style, Runyu Night Immortal portrait, elegant pristine white and light blue silk robes, gentle ethereal aura, starry night sky backdrop",
-    "夜华 三生三世十里桃花": "Three Lives Three Worlds Ten Miles of Peach Blossoms aesthetic, Ye Hua character style, commanding pure black silk robes, long sleek dark hair, mystical peach blossom orchard backdrop"
+    "夜华 三生三世十里桃花": "Three Lives Three Worlds Ten Miles of Peach Blossoms aesthetic, Ye Hua character style, commanding pure black silk robes, long sleek dark hair, mystical peach blossom orchard backdrop",
+    "Hidden Tiger Crouching Dragon": "Cinematic wuxia epic aesthetic, graceful martial arts movement, traditional flowing period attire, serene bamboo forest or mountain mist background"
 }
 
-# Super-Failsafe Image Loader (Finds .jpg, .png, .jpeg regardless of name case)
+# Super-Failsafe Image Loader
 def load_local_image(filename):
     name_no_ext = os.path.splitext(filename)[0].lower()
     base_dir = "."
